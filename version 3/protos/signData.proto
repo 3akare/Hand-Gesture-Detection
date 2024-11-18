@@ -1,0 +1,11 @@
+syntax="proto3";
+
+package signDataPackage;
+
+service Data {
+    rpc sendSignDataItem(signDataItem) returns (signDataItem);
+}
+
+message signDataItem {
+    string data = 1;
+}
