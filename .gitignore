@@ -3,3 +3,4 @@ data
 venv
 version-1/model.p
 version-1/data.pickle
+version-2/grpc js/node_modules
