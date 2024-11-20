@@ -1,14 +1,13 @@
 from flask import Flask, render_template
+from datetime import datetime
+import grpc
 import cv2
 import mediapipe as mp
-import numpy as np
-import pickle
+import signData_pb2
+import signData_pb2_grpc
 import threading
 
 app = Flask(__name__)
-
-model_dict = pickle.load(open('models/model.p', 'rb'))
-model = model_dict['model']
 
 webcam_running = True
 
@@ -54,7 +53,10 @@ def capture_images():
                     normalized_coordinates.append(y - min(temp_y))
 
                 try:
-                    print(model.predict([np.asarray(normalized_coordinates)]))
+                    with grpc.insecure_channel("localhost:50051") as channel:
+                        stub = signData_pb2_grpc.StreamDataServiceStub(channel)
+                        response = stub.biDirectionalStream(signData_pb2.RequestMessage(data=normalized_coordinates, timestamp=datetime.now().isoformat()))
+                        print(response)
                 except Exception as e:
                     print("Error " + e)
 

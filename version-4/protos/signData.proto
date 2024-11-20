@@ -1,0 +1,19 @@
+syntax="proto3";
+
+package signDataPackage;
+
+service StreamDataService {
+    rpc biDirectionalStream(RequestMessage) returns (ResponseMessage);
+}
+
+message RequestMessage {
+    repeated float data = 1;
+    string timestamp = 2;
+}
+
+message ResponseMessage {
+    string reply = 1;
+}
+
+// script to create python grpc classes
+// python -m grpc_tools.protoc -I protos --python_out=. --pyi_out=. --grpc_python_out=. signData.proto
