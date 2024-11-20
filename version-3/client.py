@@ -1,6 +1,4 @@
 import pickle
-from http.client import responses
-
 import cv2
 import grpc
 import mediapipe as mp
@@ -59,11 +57,11 @@ while True:
                 data_aux.append(x - min(x_))
                 data_aux.append(y - min(y_))
 
-        x1 = int(min(x_) * W) - 10
-        y1 = int(min(y_) * H) - 10
-
-        x2 = int(max(x_) * W) - 10
-        y2 = int(max(y_) * H) - 10
+        # x1 = int(min(x_) * W) - 10
+        # y1 = int(min(y_) * H) - 10
+        #
+        # x2 = int(max(x_) * W) - 10
+        # y2 = int(max(y_) * H) - 10
 
         prediction = model.predict([np.asarray(data_aux)])
         predicted_character = labels_dict[int(prediction[0])]
