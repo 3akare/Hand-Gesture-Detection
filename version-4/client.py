@@ -53,12 +53,13 @@ def capture_images():
                     normalized_coordinates.append(y - min(temp_y))
 
                 try:
+                    # send normalized coordinates to server
                     with grpc.insecure_channel("localhost:50051") as channel:
                         stub = signData_pb2_grpc.StreamDataServiceStub(channel)
                         response = stub.biDirectionalStream(signData_pb2.RequestMessage(data=normalized_coordinates, timestamp=datetime.now().isoformat()))
                         print(response)
                 except Exception as e:
-                    print("Error " + e)
+                    print(f"Error: {e}")
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
