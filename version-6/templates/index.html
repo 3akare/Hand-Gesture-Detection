@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Gesture Detection</title>
+    <style>
+        html{
+            width: 100dvw;
+            height: 100dvh;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            width: 100%;
+            height: 100%;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        p{
+            height: 60%;
+            width: 100%;
+            font-size: larger;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hand Gesture Detection</h1>
+    <p id="text">
+        Text Goes Here
+    </p>
+    <button id="start-webcam">Start Webcam</button>
+    <button id="stop-webcam" disabled>Stop Webcam</button>
+    <button id="send-webcam" disabled>Send Data</button>
+    <div id="status">Status: Ready</div>
+    <script>
+        const startBtn = document.getElementById("start-webcam");
+        const stopBtn = document.getElementById("stop-webcam");
+        const sendBtn = document.getElementById("send-webcam");
+        const statusDiv = document.getElementById("status");
+        const text = document.getElementById("text");
+
+        // Function to update status message
+        const updateStatus = (message, isError = false) => {
+            statusDiv.textContent = `Status: ${message}`;
+            statusDiv.style.color = isError ? "red" : "green";
+        };
+
+        // Start Webcam
+        startBtn.addEventListener("click", async () => {
+            startBtn.disabled = true; // Prevent multiple clicks
+            text.textContent = ""
+            updateStatus("Starting webcam...");
+            try {
+                const response = await fetch("/start", { method: "POST" });
+                if (!response.ok) throw new Error(`Response status: ${response.status}`);
+                const json = await response.json();
+                updateStatus(json.status);
+                stopBtn.disabled = false;
+                sendBtn.disabled = false;
+            } catch (error) {
+                updateStatus(error.message, true);
+                console.error(error);
+            } finally {
+                startBtn.disabled = false; // Re-enable button
+            }
+        });
+
+        // Stop Webcam
+        stopBtn.addEventListener("click", async () => {
+            stopBtn.disabled = true;
+            updateStatus("Stopping webcam...");
+            try {
+                const response = await fetch("/stop", { method: "POST" });
+                if (!response.ok) throw new Error(`Response status: ${response.status}`);
+                const json = await response.json();
+                updateStatus(json.status);
+                sendBtn.disabled = true; // Disable send button if webcam stops
+            } catch (error) {
+                updateStatus(error.message, true);
+                console.error(error);
+            } finally {
+                stopBtn.disabled = true;
+            }
+        });
+
+        // Send Data
+        sendBtn.addEventListener("click", async () => {
+            sendBtn.disabled = true;
+            updateStatus("Sending data...");
+            try {
+                const response = await fetch("/send", { method: "POST" });
+                if (!response.ok) throw new Error(`Response status: ${response.status}`);
+                const json = await response.json();
+                updateStatus(json.status);
+                text.textContent = json.response;
+            } catch (error) {
+                updateStatus(error.message, true);
+                console.error(error);
+            } finally {
+                sendBtn.disabled = true;
+                stopBtn.disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>
