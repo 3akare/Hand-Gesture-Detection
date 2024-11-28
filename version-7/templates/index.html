@@ -60,7 +60,7 @@
         const stopBtn = document.getElementById("stop-webcam");
         const sendBtn = document.getElementById("send-webcam");
         const statusDiv = document.getElementById("status");
-        const text = document.getElementById("text");
+        const textElement = document.getElementById("text");
 
         // Function to update status message
         const updateStatus = (message, isError = false) => {
@@ -71,7 +71,7 @@
         // Start Webcam
         startBtn.addEventListener("click", async () => {
             startBtn.disabled = true; // Prevent multiple clicks
-            text.textContent = ""
+            textElement.textContent = ""
             updateStatus("Starting webcam...");
             try {
                 const response = await fetch("/start", { method: "POST" });
@@ -84,11 +84,10 @@
                 updateStatus(error.message, true);
                 console.error(error);
             } finally {
-                startBtn.disabled = false; // Re-enable button
+                startBtn.disabled = false;
             }
         });
 
-        // Stop Webcam
         stopBtn.addEventListener("click", async () => {
             stopBtn.disabled = true;
             updateStatus("Stopping webcam...");
@@ -97,7 +96,7 @@
                 if (!response.ok) throw new Error(`Response status: ${response.status}`);
                 const json = await response.json();
                 updateStatus(json.status);
-                sendBtn.disabled = true; // Disable send button if webcam stops
+                sendBtn.disabled = true;
             } catch (error) {
                 updateStatus(error.message, true);
                 console.error(error);
@@ -106,7 +105,6 @@
             }
         });
 
-        // Send Data
         sendBtn.addEventListener("click", async () => {
             sendBtn.disabled = true;
             updateStatus("Sending data...");
@@ -125,17 +123,18 @@
             }
         });
 
-
         document.getElementById('playButton').addEventListener('click', () => {
-            const textElement = document.getElementById('text'); // Ensure you define the text element
             const text = textElement.innerText;
+
             // Split text into words and wrap each in a span
             const words = text.split(' ');
             textElement.innerHTML = words.map(word => `<span>${word}</span>`).join(' ');
             const utterance = new SpeechSynthesisUtterance(text);
             const spans = textElement.querySelectorAll('span');
+
             let currentWordIndex = 0;
-            // Add onboundary event to track word boundaries
+
+            // screen reader text-highlight
             utterance.onboundary = (event) => {
                 if (event.charIndex >= 0) {
                     // Remove highlighting from all words
